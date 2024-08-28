@@ -1,24 +1,73 @@
 import { Link,useNavigate } from "react-router-dom";
 import { useState,useEffect } from "react";
+import { db } from './firebase/firebase.init';
+import { collection, getDocs ,doc , updateDoc} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
  
 const Home = () => {
   const navigate = useNavigate();
 
-  const [data, setData] = useState(null);
-  const [cates, setCates] = useState(null);
+  
   const [showing, setShowing] = useState([]);
   const [searching, setSearching] = useState([]);
+  const [data, setData] = useState(null);
+  const [cates, setCates] = useState(null);
+  const [TableId, setTableId] = useState();
 
-  
- useEffect(() => {
-   const localData = localStorage.getItem('data')
-   setData(JSON.parse(localData));
-   const localCates = localStorage.getItem('cates')
-   setCates(JSON.parse(localCates));
-  
+  const connection = collection(db, 'data')
 
- }, []);
+  const getStore = async () =>{
+   try {
+       const Alldata = await getDocs(connection);
+       const filterData = Alldata.docs.map((doc) => ({...doc.data() ,id: doc.id }))
+      
+       const fireData = filterData[0].data;
+       const fireCates = filterData[0].cates;
+
+       setTableId(filterData[0].id)
+
+       setData(JSON.parse(fireData));
+       setCates(fireCates)
+       console.log(TableId)
+      // console.log(fireCates)
+   } catch (err) {
+       toast(err)
+   }
+}
+
+const updateStoreData = async (newData) => {
+   const dataDoc = doc(db, "data", TableId);
+   try{
+       await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+       getStore()
+       toast('updated successfull')
+   } catch (err) {
+      toast(err);
+   }
+   
+ };
+const updateStoreCates = async (newCates) => {
+   const dataDoc = doc(db, "data", TableId);
+   try{
+       await updateDoc(dataDoc, { cates: newCates});
+       getStore()
+       toast('updated successfull')
+   } catch (err) {
+      toast(err);
+   }
+   
+ };
+
+
+
+  useEffect(()=>{
+   getStore()
+  },[])
+
+
 
  // const AllData = data;
 
@@ -39,22 +88,36 @@ newData.splice((id), 1); // Remove the element at index 2 (3)
 console.log(newData);
 
 setData(newData);
-localStorage.setItem("data" , JSON.stringify(newData))
+// localStorage.setItem("data" , JSON.stringify(newData))
+updateStoreData(newData);
      
 
    }
 let cates_show = [];
 const categoryfix = () =>{
-  if(showing.length === 0){
 
-      let newItem = [...showing]
+  ///let newItem = [...showing];
+
+
+  let flag = true
+  for(let i = 0; i < showing.length; i++){
+    if(!showing[i]){
+      flag = false;
+    }
+  }
+  console.log(showing)
+  console.log('flagflagflag-' , flag)
+
+  if(showing.length === 0 || flag){
+
+      const newItem = []
       console.log('empty')
        console.log(cates_show.length)
        for(let i = 0; i < cates.length; i++){newItem.push(false)}
 
        setShowing(newItem);
      }
-     
+  
  
    console.log(showing)
     
@@ -93,7 +156,7 @@ const handleCategories = (id,e) => {
 
 
 const handleSearch = (e) => {
-   console.log(e.target.value);
+ //  console.log(e.target.value);
 //  // let oldData = [...data]
 let newItem = [...searching];
 for(let i = 0; i < newItem.length; i++){newItem[i] = false}
@@ -195,6 +258,7 @@ const handleSortName = (e) => {
     return (
         <div>
             <div className="main max-w-6xl  mx-auto mt-10 ">
+            <ToastContainer />
               {/* <button className="btn btn-success " onClick={searchfix}>Category fix</button> */}
         <div className="options flex items-center flex-wrap">
 
@@ -344,7 +408,7 @@ const handleSortName = (e) => {
                       return (
                       
                         <tr className={searching ? searching[indexs] == false ? "hidden" : "" :""} key={indexs}>
-                      <th className="first-th" onClick={()=> navigate(`details/${indexs}`)} >{serial++}</th>
+                      <th className="first-th " onClick={()=> navigate(`details/${indexs}`)} >{serial++}</th>
                       
                       {cates.map((item,index)=>{
                         return(

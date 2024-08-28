@@ -1,32 +1,79 @@
 import { useParams , useNavigate} from "react-router-dom";
 import {  useState,useEffect } from "react";
+import { db } from './firebase/firebase.init';
+import { collection, getDocs ,doc , updateDoc} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Update = () => {
 
   const navigate = useNavigate()
  
 
-    const [data, setData] = useState(null);
-    const [cates, setCates] = useState(null);
+   
    // const myRef = useRef(null);
 
   
       const {id} = useParams();
-
-
   const [input , setinput] = useState(null);
+   const [data, setData] = useState(null);
+   const [cates, setCates] = useState(null);
+   const [TableId, setTableId] = useState();
+
+   const connection = collection(db, 'data')
+
+   const getStore = async () =>{
+    try {
+        const Alldata = await getDocs(connection);
+        const filterData = Alldata.docs.map((doc) => ({...doc.data() ,id: doc.id }))
+       
+        const fireData = filterData[0].data;
+        const fireCates = filterData[0].cates;
+
+        setTableId(filterData[0].id)
+
+        setData(JSON.parse(fireData));
+        setCates(fireCates)
+        console.log(TableId)
+      //  console.log(fireData)
+      //  console.log(fireCates)
+    } catch (err) {
+        toast(err)
+    }
+}
+
+const updateStoreData = async (newData) => {
+  const dataDoc = doc(db, "data", TableId);
+  try{
+      await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+      getStore()
+      toast('updated successfull')
+  } catch (err) {
+     toast(err);
+  }
   
-   useEffect(() => {
-     const localData = localStorage.getItem('data')
-     setData(JSON.parse(localData));
-   //  console.log(localData[1])
-     const localCates = localStorage.getItem('cates')
-     setCates(JSON.parse(localCates));
-     
-   //  const element = myRef.current;
-    
+};
+const updateStoreCates = async (newCates) => {
+  const dataDoc = doc(db, "data", TableId);
+  try{
+      await updateDoc(dataDoc, { cates: newCates});
+      getStore()
+      toast('updated successfull')
+  } catch (err) {
+     toast(err);
+  }
   
-   }, []);
+};
+
+
+
+
+   useEffect(()=>{
+    getStore()
+   },[])
+
+ 
 
    useEffect(() => {
     if(data){
@@ -36,11 +83,11 @@ const Update = () => {
   
   }, [data]);
 
-   const inputdata = () =>{
+  //  const inputdata = () =>{
 
-     const newData = [...data];
-      setinput(newData[id])
-   }
+  //    const newData = [...data];
+  //     setinput(newData[id])
+  //  }
  
 
 
@@ -50,8 +97,8 @@ const Update = () => {
   const handleUpdate = (e) =>{
     e.preventDefault()
 
-    const updateItem = data[id];
-    console.log(updateItem);
+  //  const updateItem = data[id];
+   // console.log(updateItem);
 
      
    const allInputs = e.target.querySelectorAll('input');
@@ -71,13 +118,15 @@ const Update = () => {
     }
 
     if(newItem[1]){
-          console.log(newItem);
+        //  console.log(newItem);
 
     const newData = [...data]
     newData[id] = newItem;
-    localStorage.setItem('data', JSON.stringify(newData))
+   // localStorage.setItem('data', JSON.stringify(newData))
+   updateStoreData(newData)
    
-    navigate('/')
+   // navigate('/')
+   console.log(newItem)
 
     }else{
        document.getElementById('my_modal_empty').showModal();
@@ -85,13 +134,13 @@ const Update = () => {
 
   }
   const handleChange = (index, e) =>{
-    const {name, value} = e.target;
-    console.log(name,value)
-    console.log(index)
-    console.log()
+    const { value} = e.target;
+   // console.log(name,value)
+   // console.log(index)
+   // console.log()
     const newInput = [...input];
     newInput[index] = value
-    console.log(newInput)
+   // console.log(newInput)
     setinput(newInput);
     
 
@@ -113,8 +162,10 @@ const Update = () => {
       if(input){
           console.log(input)
       const newCates = [...cates , input]
-      localStorage.setItem("cates" , JSON.stringify(newCates));
+     // localStorage.setItem("cates" , JSON.stringify(newCates));
+      updateStoreCates(newCates)
       setCates(newCates)
+
       e.target.text.value = ''
       }
     
@@ -131,6 +182,7 @@ const Update = () => {
 
     return (
         <div >
+          <ToastContainer />
             <div className="main max-w-6xl  mx-auto mt-10 ">
             <dialog id="my_modal_5" className="modal">
   <div className="modal-box">
@@ -223,7 +275,8 @@ const Update = () => {
       </button> </div>
 
 
-</div>
+</div><div className="mb-28"></div>
+
         </div>
     );
 };

@@ -1,19 +1,69 @@
 import {  useEffect, useState } from 'react';
+import { db } from './firebase/firebase.init';
+import { collection, getDocs ,doc , updateDoc} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const New = () => {
 
   const [data, setData] = useState(null);
-  const [cates, setCates] = useState(null);
+   const [cates, setCates] = useState(null);
+   const [TableId, setTableId] = useState();
 
-  
- useEffect(() => {
-   const localData = localStorage.getItem('data')
-   setData(JSON.parse(localData));
-   const localCates = localStorage.getItem('cates')
-   setCates(JSON.parse(localCates));
+   const connection = collection(db, 'data')
+
+   const getStore = async () =>{
+    try {
+        const data = await getDocs(connection);
+        const filterData = data.docs.map((doc) => ({...doc.data() ,id: doc.id }))
+       
+        const fireData = filterData[0].data;
+        const fireCates = filterData[0].cates;
+
+        setTableId(filterData[0].id)
+
+        setData(JSON.parse(fireData));
+        setCates(fireCates)
+      //  console.log(fireData)
+      //  console.log(fireCates)
+    } catch (err) {
+        toast(err)
+    }
+}
 
 
- }, []);
+const updateStoreData = async (newData) => {
+    const dataDoc = doc(db, "data", TableId);
+    try{
+        await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+        getStore()
+        toast('updated successfull')
+    } catch (err) {
+       toast(err);
+    }
+    
+  };
+ const updateStoreCates = async (newCates) => {
+    const dataDoc = doc(db, "data", TableId);
+    try{
+        await updateDoc(dataDoc, { cates: newCates});
+        getStore()
+        toast('updated successfull')
+    } catch (err) {
+       toast(err);
+    }
+    
+  };
+ 
+
+
+
+   useEffect(()=>{
+    getStore()
+   },[])
+
+ 
 
  const AllData = data;
  // console.log(cates)
@@ -78,7 +128,8 @@ const handleSubmit = (e)=>{
     // console.log(data);
     // console.log(cates);
   
-     localStorage.setItem('data', JSON.stringify(AllData));
+   //  localStorage.setItem('data', JSON.stringify(AllData));
+     updateStoreData(AllData);
      document.getElementById('my_modal_success').showModal()
   
   }else{
@@ -108,7 +159,8 @@ const handleAdd =(e)=>{
   if(input){
      console.log(input)
   const newCates = [...cates , input]
-  localStorage.setItem("cates" , JSON.stringify(newCates));
+//  localStorage.setItem("cates" , JSON.stringify(newCates));
+  updateStoreCates(newCates);
   setCates(newCates)
     e.target.text.value = ''
   }
@@ -124,6 +176,7 @@ const handleAdd =(e)=>{
 
     return (
         <div>
+          <ToastContainer />
           <dialog id="my_modal_5" className="modal">
   <div className="modal-box">
     <form action=""></form>
@@ -238,6 +291,8 @@ const handleAdd =(e)=>{
 
 
 </div>
+
+<div className="mb-28"></div>
         </div>
     );
 };

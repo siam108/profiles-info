@@ -1,25 +1,76 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { db } from './firebase/firebase.init';
+import { collection, getDocs ,doc , updateDoc} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const CategoryItems = () => {
-  const [data, setData] = useState(null);
-  const [cates, setCates] = useState(null);
 
-  const { id } = useParams();
+ const { id } = useParams();
 
-  // const [input , setinput] = useState(null);
+ const [data, setData] = useState(null);
+ const [cates, setCates] = useState(null);
+ const [TableId, setTableId] = useState();
 
-  useEffect(() => {
-    const localData = localStorage.getItem("data");
-    setData(JSON.parse(localData));
-    //  console.log(localData[1])
-    const localCates = localStorage.getItem("cates");
-    setCates(JSON.parse(localCates));
-  }, []);
+ const connection = collection(db, 'data')
+
+ const getStore = async () =>{
+  try {
+      const data = await getDocs(connection);
+      const filterData = data.docs.map((doc) => ({...doc.data() ,id: doc.id }))
+     
+      const fireData = filterData[0].data;
+      const fireCates = filterData[0].cates;
+
+      setTableId(filterData[0].id)
+
+      setData(JSON.parse(fireData));
+      setCates(fireCates)
+    //  console.log(fireData)
+    //  console.log(fireCates)
+  } catch (err) {
+      toast(err)
+  }
+}
+
+
+const updateStoreData = async (newData) => {
+  const dataDoc = doc(db, "data", TableId);
+  try{
+      await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+      getStore()
+      toast('updated successfull')
+  } catch (err) {
+     toast(err);
+  }
+  
+};
+const updateStoreCates = async (newCates) => {
+  const dataDoc = doc(db, "data", TableId);
+  try{
+      await updateDoc(dataDoc, { cates: newCates});
+      getStore()
+      toast('updated successfull')
+  } catch (err) {
+     toast(err);
+  }
+  
+};
+
+
+
+
+ useEffect(()=>{
+  getStore()
+ },[])
+
 
   let serial = 1;
 
   return (
     <div>
+      <ToastContainer />
       <div className="main max-w-6xl  mx-auto mt-10 ">
         <Link to="/categories" className="btn btn-info mt-10 btn-sm  ">
           <svg

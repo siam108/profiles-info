@@ -17,6 +17,8 @@ import Details from './Details';
 import Update from './Update';
 import Login from './login';
 import CategoryItems from './CategoryItems';
+import Database from './database';
+import UpdatePass from './UpdatePass';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -47,15 +49,20 @@ const router = createBrowserRouter([
          path: "/category-items/:id",
          element: <CategoryItems></CategoryItems>
       },
+     
       {
-         path: "/pass-update",
-         element: <CategoryItems></CategoryItems>
+         path: "/db",
+         element: <Database></Database>
       },
      
     ]
   }, {
    path: "/login",
    element: <Login></Login>
+},
+{
+   path: "/pass-update",
+   element: <UpdatePass></UpdatePass>
 },
 ]);
 

@@ -7,8 +7,8 @@ const Root = () => {
  
 const navigate = useNavigate();
  useEffect(() => {
-   const categories = localStorage.getItem('cates');
-   const data = localStorage.getItem('data');
+  //  const categories = localStorage.getItem('cates');
+  //  const data = localStorage.getItem('data');
    const log = sessionStorage.getItem('log');
 
   
@@ -19,26 +19,26 @@ const navigate = useNavigate();
       navigate('/login')
    }
 
-   if(categories){
-    console.log('availabe categories')
-   }else{
-    const cates = [
-       "Date", "Name", "Number", "Facebook" , "Address", "Institution" , "Connection"
-      ]
-    localStorage.setItem('cates' , JSON.stringify(cates));
-   }
+  //  if(categories){
+  //   console.log('availabe categories')
+  //  }else{
+  //   const cates = [
+  //      "Date", "Name", "Number", "Facebook" , "Address", "Institution" , "Connection"
+  //     ]
+  //   localStorage.setItem('cates' , JSON.stringify(cates));
+  //  }
 
-   if(data){
-    console.log('availabe data')
-   }else{
-    const currentDate = new Date();
-    const date = currentDate.toLocaleDateString()
+  //  if(data){
+  //   console.log('availabe data')
+  //  }else{
+  //   const currentDate = new Date();
+  //   const date = currentDate.toLocaleDateString()
    
-    const data = [
-       [date, "shophia", "222342", "shophia204" , "london uk", "standford" , "ustad er gf"],
-      ]
-    localStorage.setItem('data' , JSON.stringify(data));
-   }
+  //   const data = [
+  //      [date, "shophia", "222342", "shophia204" , "london uk", "standford" , "local"],
+  //     ]
+  //   localStorage.setItem('data' , JSON.stringify(data));
+  //  }
  }, []);
 
 

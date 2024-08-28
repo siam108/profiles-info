@@ -1,23 +1,78 @@
 import { useState,useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { db } from './firebase/firebase.init';
+import { collection, getDocs ,doc , updateDoc} from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Categories = () => {
 
-  const navigate = useNavigate();
+ // const navigate = useNavigate();
   
-  const [data, setData] = useState(null);
-  const [cates, setCates] = useState(null);
+
   const [updating, setUpdating] = useState(null);
 
-  
- useEffect(() => {
-   const localData = localStorage.getItem('data')
-   setData(JSON.parse(localData));
-   const localCates = localStorage.getItem('cates')
-   setCates(JSON.parse(localCates));
+  const [data, setData] = useState(null);
+  const [cates, setCates] = useState(null);
+  const [TableId, setTableId] = useState();
+
+  const connection = collection(db, 'data')
+
+  const getStore = async () =>{
+   try {
+       const data = await getDocs(connection);
+       const filterData = data.docs.map((doc) => ({...doc.data() ,id: doc.id }))
+      
+       const fireData = filterData[0].data;
+       const fireCates = filterData[0].cates;
+
+       setTableId(filterData[0].id)
+
+       setData(JSON.parse(fireData));
+       setCates(fireCates)
+     //  console.log(fireData)
+     //  console.log(fireCates)
+   } catch (err) {
+       toast(err)
+   }
+}
+
+
+const updateStoreData = async (newData) => {
+   const dataDoc = doc(db, "data", TableId);
+   try{
+       await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+       getStore()
+       toast('updated successfull')
+   } catch (err) {
+      toast(err);
+   }
+   
+ };
+const updateStoreCates = async (newCates) => {
+   const dataDoc = doc(db, "data", TableId);
+   try{
+       await updateDoc(dataDoc, { cates: newCates});
+       getStore()
+       toast('updated successfull')
+   } catch (err) {
+      toast(err);
+   }
+   
+ };
+
+
+
+
+  useEffect(()=>{
+   getStore()
+  },[])
+
+
+
   
 
- }, []);
 
  const  handleUpdate = (id) =>{
   document.getElementById('my_modal_5').showModal();
@@ -32,7 +87,8 @@ const Categories = () => {
 
   const newCates = [...cates]
   newCates[updating] = input
-  localStorage.setItem("cates" , JSON.stringify(newCates));
+ // localStorage.setItem("cates" , JSON.stringify(newCates));
+  updateStoreCates(newCates)
   setCates(newCates)
  e.target.update.value = ''
   //console.log(e.target)
@@ -46,11 +102,12 @@ const Categories = () => {
   
  }
  const handleFormAdd =(e) =>{
-  const input = e.target.text.value;
+  const input = e.target.new.value;
   console.log(input)
   if(input){
   const newCates = [...cates , input]
-  localStorage.setItem("cates" , JSON.stringify(newCates));
+ // localStorage.setItem("cates" , JSON.stringify(newCates));
+  updateStoreCates(newCates);
   setCates(newCates)
   e.target.new.value = ''
   // navigate('/categories')
@@ -61,7 +118,8 @@ const Categories = () => {
    console.log(id);
    const newCates = [...cates ];
   newCates.splice(id , 1)
-  localStorage.setItem("cates" , JSON.stringify(newCates));
+  //localStorage.setItem("cates" , JSON.stringify(newCates));
+  updateStoreCates(newCates)
   setCates(newCates)
   console.log(data)
 
@@ -70,7 +128,8 @@ const Categories = () => {
     console.log(newData[i].splice(id,1));
     
    }
-   localStorage.setItem("data" , JSON.stringify(newData));
+  // localStorage.setItem("data" , JSON.stringify(newData));
+  updateStoreData(newData);
 
  }
 
@@ -88,6 +147,7 @@ const Categories = () => {
  let serial = 1;
     return (
         <div>
+          <ToastContainer />
           {/* Open the modal using document.getElementById('ID').showModal() method
 <button className="btn" onClick={()=>document.getElementById('my_modal_5').showModal()}>open modal</button> */}
 <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
@@ -224,7 +284,8 @@ const Categories = () => {
   </button>
 
 
-</div>
+</div><div className="mb-10"></div>
+
         </div>
     );
 };
