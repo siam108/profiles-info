@@ -133,25 +133,32 @@ updateStoreData(newData);
    }
 let cates_show = [];
 const categoryfix = () =>{
+  
 
   ///let newItem = [...showing];
+ console.log(showing)
 
+  // let flag = true;
+  // for(let i = 0; i < showing.length; i++){
+  //   if(!showing[i]){
+  //     flag = false;
+  //   }
+  // }
+  // let flags = true;
+  // for(let i = 0; i < showing.length; i++){
+  //   if(showing[i]){
+  //     flags = false;
+  //   }
+  // }|| flag || flags
+ 
+  // console.log('flagflagflag-' , flag)
 
-  let flag = true
-  for(let i = 0; i < showing.length; i++){
-    if(!showing[i]){
-      flag = false;
-    }
-  }
-  console.log(showing)
-  console.log('flagflagflag-' , flag)
-
-  if(showing.length === 0 || flag){
+  if(showing.length === 0 ){
 
       const newItem = []
       console.log('empty')
        console.log(cates_show.length)
-       for(let i = 0; i < cates.length; i++){newItem.push(false)}
+       for(let i = 0; i < cates.length; i++){newItem.push(true)}
 
        setShowing(newItem);
      }
@@ -174,21 +181,57 @@ const handleCategories = (id,e) => {
   newItem[id] = box.checked;
   // cates_show[id] = box.checked;
 
-  let flag = true
-  for(let i = 0; i < newItem.length; i++){
-    if(newItem[i]){
-      flag = false;
-    }
-  }
+//   let flag = true
+//   for(let i = 0; i < newItem.length; i++){
+//     if(newItem[i]){
+//       flag = false;
+//     }
+//   }
 
-  if(flag){
-    for(let i = 0; i < newItem.length; i++){
-      newItem[i] = true;
-  }
-}
+//   if(flag){
+//     for(let i = 0; i < newItem.length; i++){
+//       newItem[i] = true;
+//   }
+// }
 
   setShowing(newItem)
    console.log(showing) 
+}
+
+const handleAllCategories = (e) => {
+   let allboxs = document.querySelectorAll('.cetegoryboxs .check-item');
+   
+
+ // console.log(e.target.checked)
+
+
+
+  if(e.target.checked == true){
+    for(let i = 0; i < allboxs.length; i++){
+      allboxs[i].checked = true
+
+      
+    }
+    const newItem = []
+    console.log('empty')
+     console.log(cates_show.length)
+     for(let i = 0; i < cates.length; i++){newItem.push(true)}
+
+     setShowing(newItem);
+  }else{
+    for(let i = 0; i < allboxs.length; i++){
+      allboxs[i].checked = false
+      
+    }
+    const newItem = []
+    console.log('empty')
+     console.log(cates_show.length)
+     for(let i = 0; i < cates.length; i++){newItem.push(false)}
+
+     setShowing(newItem);
+  }
+ 
+  
 }
 
 
@@ -360,13 +403,21 @@ const handleSortName = (e) => {
                      
                     
                     </div>
-                <ul tabIndex={0
-
-                } className="menu dropdown-content bg-base-300 rounded-box z-[10] w-52 p-2 shadow">
+                <ul tabIndex={0} className="menu dropdown-content bg-base-300 rounded-box z-[10] w-52 p-2 shadow cetegoryboxs">
                   
                   <form action="">
 
+                  <div className="form-control" >
+                            <label className="label cursor-pointer justify-start gap-5"> 
+                              <input type="checkbox" name="box" defaultChecked={true}  className="checkbox "  onChange={handleAllCategories}/>
+                             
+                              <span className="label-text">All</span>
+                             
+                            </label>
+                          </div>
+
                   {
+                    
                    
                     cates?.map((item,index) => {
                       return(
@@ -374,7 +425,7 @@ const handleSortName = (e) => {
                           
                          <div className="form-control" key={index}>
                             <label className="label cursor-pointer justify-start gap-5"> 
-                              <input type="checkbox" name="box"   className="checkbox"  onClick={()=>handleCategories(index,event)}/>
+                              <input type="checkbox" name="box" defaultChecked={true}  className="checkbox check-item"  onClick={()=>handleCategories(index,event)}/>
                              
                               <span className="label-text">{item}</span>
                              
