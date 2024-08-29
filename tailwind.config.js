@@ -11,7 +11,7 @@ export default {
     require('daisyui'),
   ],
   daisyui: {
-    themes: ["light","dracula"],
+    themes: ["light","dracula" , 'sunset'],
     extend: {
       dark: false, // Set `dark` to `false` to force light theme
     },

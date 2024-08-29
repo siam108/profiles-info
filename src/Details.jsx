@@ -38,23 +38,27 @@ const Details = () => {
  }
  
  
- const updateStoreData = async (newData) => {
-     const dataDoc = doc(db, "data", TableId);
-     try{
-         await updateDoc(dataDoc, {data : JSON.stringify(newData)});
-         getStore()
-         toast('updated successfull')
-     } catch (err) {
-        toast(err);
-     }
-     
-   };
+ const updateStoreData = async (newData , undo) => {
+  const dataDoc = doc(db, "data", TableId);
+  try{
+      await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+      getStore()
+      if(undo){
+       toast.success( "undo done !")
+      }else{
+        toast.success( <>Updated   <button onClick={()=> {handleUndoData(); toast.dismiss();}} className="btn btn-primary ml-5">Undo changes</button></>,  {pauseOnHover: false,})
+      }
+  } catch (err) {
+     toast(err);
+  }
+  
+};
   const updateStoreCates = async (newCates) => {
      const dataDoc = doc(db, "data", TableId);
      try{
          await updateDoc(dataDoc, { cates: newCates});
          getStore()
-         toast('updated successfull')
+         toast('updated successfullssss <button class="btn btn-info"> Undo</button>')
      } catch (err) {
         toast(err);
      }
@@ -72,8 +76,20 @@ const Details = () => {
 
  let serial = 1;
 
- const handleDelete =() =>{
+ const handleUndoData = () => {
   
+  const tempData = localStorage.getItem('temp-data');
+  
+  console.log(tempData);
+  setData(JSON.parse(tempData));
+  updateStoreData(JSON.parse(tempData) , true);
+
+}
+
+
+ const handleDelete =() =>{
+  localStorage.setItem('temp-data' , JSON.stringify(data));
+
   console.log(id);
 
   const newData = [...data];
@@ -85,17 +101,32 @@ console.log(newData);
 
 setData(newData);
 // localStorage.setItem("data" , JSON.stringify(newData))
+
 updateStoreData(newData);
+
 
      
 navigate('/')
-
-   }
+// document.getElementById('my_modal_ss').showModal();
+}
 
 
     return (
         <div>
-          <ToastContainer />
+          <ToastContainer autoClose={3000}/>
+
+
+          {/* <dialog id="my_modal_ss" className="modal">
+  <div className="modal-box">
+    <h3 className="font-bold text-lg text-green-700">Delete Successfully!!</h3>
+     
+  </div>
+  <form method="dialog" className="modal-backdrop">
+    <Link className="btn btn-primary">Back</Link>
+    <button className="btn btn-info">Undo Changes</button>
+   
+  </form>
+</dialog> */}
             <div className="main max-w-6xl  mx-auto mt-10 ">
 
 <Link to="/" className="btn btn-info mt-10 btn-sm  ">
@@ -110,42 +141,48 @@ navigate('/')
    Back
   </Link>
 
-<h1 className="text-3xl font-bold mt-2 mb-8">Details of : {data ? data[id][1] : ''}</h1>
+   
+    <div>
+    <h1 className="text-3xl font-bold mt-2 mb-8">Details of : {data ? data[id][1] : ''}</h1>
 
-<table className="table table-zebra">
-    
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Category</th>
-        <th>Description</th>
-         
-      </tr>
-    </thead>
-    <tbody>
-
-      {
-        cates?.map((item,index) => {
-          return (
-            <tr key={index}>
-            <th>{serial++}</th>
-            <td>{item}</td>
-            <td>
-              {data[id][index]}
-            </td>
+    <table className="table table-zebra">
+        
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Category</th>
+            <th>Description</th>
              
           </tr>
-          )
-        })
-      }
-
-
-     
-     
+        </thead>
+        <tbody>
     
-      
-    </tbody>
-  </table>
+          {
+            cates?.map((item,index) => {
+              return (
+                <tr key={index}>
+                <th>{serial++}</th>
+                <td>{item}</td>
+                <td>
+                  {data[id][index]}
+                </td>
+                 
+              </tr>
+              )
+            })
+          }
+    
+    
+         
+         
+        
+          
+        </tbody>
+      </table>
+      </div>
+
+
+
 
       
 <div className="mb-8 mt-10">

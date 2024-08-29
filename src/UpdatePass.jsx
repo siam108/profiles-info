@@ -3,7 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { db } from './firebase/firebase.init';
 import { collection, getDocs ,doc , updateDoc} from 'firebase/firestore';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const UpdatePass = () => {
@@ -31,6 +31,11 @@ const UpdatePass = () => {
     }
 }
 
+  
+useEffect(()=>{
+    getStore()
+   },[])
+
 
 
 
@@ -41,7 +46,7 @@ const UpdatePass = () => {
     const n_pass = e.target.n_password.value
     const c_pass = e.target.c_password.value
 
-    getStore();
+  
 
     
 
@@ -93,7 +98,7 @@ const UpdatePass = () => {
     </div>
   </div>
 </dialog>
-            <ToastContainer />
+            <ToastContainer autoClose={3000} />
               <div className='flex flex-col gap-6 items-center justify-center h-screen'>
           <h1 className='text-2xl font-bold' >Update Password.</h1>
           <form action="" className='flex flex-col gap-6  justify-center' onSubmit={handleUpdatePass}>

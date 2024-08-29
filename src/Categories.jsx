@@ -39,28 +39,61 @@ const Categories = () => {
 }
 
 
-const updateStoreData = async (newData) => {
-   const dataDoc = doc(db, "data", TableId);
-   try{
-       await updateDoc(dataDoc, {data : JSON.stringify(newData)});
-       getStore()
-       toast('updated successfull')
-   } catch (err) {
-      toast(err);
-   }
-   
- };
-const updateStoreCates = async (newCates) => {
-   const dataDoc = doc(db, "data", TableId);
-   try{
-       await updateDoc(dataDoc, { cates: newCates});
-       getStore()
-       toast('updated successfull')
-   } catch (err) {
-      toast(err);
-   }
-   
- };
+const updateStoreData = async (newData , undo) => {
+  const dataDoc = doc(db, "data", TableId);
+  try{
+      await updateDoc(dataDoc, {data : JSON.stringify(newData)});
+      getStore()
+      if(undo){
+       toast.success( "undo done !");
+      
+       
+      }else{
+        toast.success( <>updated   <button onClick={()=> {handleUndoData(); toast.dismiss();}} className="btn btn-primary ml-5">Undo changes</button></>)
+      }
+  } catch (err) {
+     toast(err);
+  }
+  
+};
+const updateStoreCates = async (newCates , undo) => {
+ const dataDoc = doc(db, "data", TableId);
+ try{
+     await updateDoc(dataDoc, { cates: newCates});
+     getStore()
+     if(undo){
+       toast.success( "undo done !");
+      
+       
+      }else{
+        toast.success( <>Updated <button onClick={()=> {handleUndoCates(); toast.dismiss();}} className="btn btn-primary ml-5">Undo changes</button></>)
+      }
+ } catch (err) {
+    toast(err);
+ }
+ 
+};
+
+const updateStoreBoth = async (newData, newCates , undo) => {
+
+  const dataDoc = doc(db, "data", TableId);
+  console.log('boothe updating')
+
+  try{
+      await updateDoc(dataDoc, { cates: newCates , data : JSON.stringify(newData)});
+      getStore()
+      if(undo){
+        toast.success( "undo done !");
+       
+        
+       }else{
+         toast.success( <>Updated <button onClick={()=> {handleUndoBoth(); toast.dismiss();}} className="btn btn-primary ml-5">Undo changes</button></>)
+       }
+  } catch (err) {
+     toast(err);
+  }
+
+}
 
 
 
@@ -69,7 +102,36 @@ const updateStoreCates = async (newCates) => {
    getStore()
   },[])
 
+  const handleUndoBoth = () => {
+    const tempData = localStorage.getItem('temp-data');
+    const tempCates = localStorage.getItem('temp-cates');
+    setData(JSON.parse(tempData));
+    setCates(JSON.parse(tempCates));
 
+    updateStoreBoth(JSON.parse(tempData), JSON.parse(tempCates) , true);
+
+
+    
+  }
+
+  const handleUndoData = () => {
+  
+    const tempData = localStorage.getItem('temp-data');
+    
+  //  console.log('from update');
+    setData(JSON.parse(tempData));
+    updateStoreData(JSON.parse(tempData) , true);
+  }
+  const handleUndoCates = () => {
+  
+    const tempCates = localStorage.getItem('temp-cates');
+    
+  //  console.log('from update');
+    setData(JSON.parse(tempCates));
+    updateStoreCates(JSON.parse(tempCates) , true);
+  }
+ 
+ 
 
   
 
@@ -81,9 +143,10 @@ const updateStoreCates = async (newCates) => {
  }
 
  const handleUpdateForm = (e) =>{
+  localStorage.setItem("temp-cates" , JSON.stringify(cates))
   const input = e.target.update.value;
   if(input){
-      console.log(input, updating)
+    //  console.log(input, updating)
 
   const newCates = [...cates]
   newCates[updating] = input
@@ -102,6 +165,7 @@ const updateStoreCates = async (newCates) => {
   
  }
  const handleFormAdd =(e) =>{
+  localStorage.setItem("temp-cates" , JSON.stringify(cates))
   const input = e.target.new.value;
   console.log(input)
   if(input){
@@ -115,13 +179,15 @@ const updateStoreCates = async (newCates) => {
  }
 
  const handleDelete = (id) =>{
+  localStorage.setItem('temp-data' , JSON.stringify(data));
+  localStorage.setItem("temp-cates" , JSON.stringify(cates))
    console.log(id);
    const newCates = [...cates ];
   newCates.splice(id , 1)
   //localStorage.setItem("cates" , JSON.stringify(newCates));
-  updateStoreCates(newCates)
-  setCates(newCates)
-  console.log(data)
+ // updateStoreCates(newCates)
+ 
+  // console.log(data)
 
  const newData = [...data];
    for(let i=0; i< data.length; i++){
@@ -129,7 +195,9 @@ const updateStoreCates = async (newCates) => {
     
    }
   // localStorage.setItem("data" , JSON.stringify(newData));
-  updateStoreData(newData);
+ // updateStoreData(newData);
+  updateStoreBoth(newData, newCates);
+  setCates(newCates)
 
  }
 
@@ -147,7 +215,7 @@ const updateStoreCates = async (newCates) => {
  let serial = 1;
     return (
         <div>
-          <ToastContainer />
+          <ToastContainer autoClose={3000} />
           {/* Open the modal using document.getElementById('ID').showModal() method
 <button className="btn" onClick={()=>document.getElementById('my_modal_5').showModal()}>open modal</button> */}
 <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">

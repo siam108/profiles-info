@@ -38,12 +38,17 @@ const Home = () => {
    }
 }
 
-const updateStoreData = async (newData) => {
+const updateStoreData = async (newData , undo) => {
    const dataDoc = doc(db, "data", TableId);
    try{
        await updateDoc(dataDoc, {data : JSON.stringify(newData)});
        getStore()
-       toast('updated successfull')
+       if(undo){
+        toast.success( "undo done !")
+        
+       }else{
+         toast.success( <>Updated   <button onClick={()=> {handleUndoData(); toast.dismiss();}} className="btn btn-primary ml-5">Undo changes</button></>)
+       }
    } catch (err) {
       toast(err);
    }
@@ -54,7 +59,7 @@ const updateStoreCates = async (newCates) => {
    try{
        await updateDoc(dataDoc, { cates: newCates});
        getStore()
-       toast('updated successfull')
+       toast('updated successfullssss <button class="btn btn-info"> Undo</button>')
    } catch (err) {
       toast(err);
    }
@@ -65,6 +70,19 @@ const updateStoreCates = async (newCates) => {
 
   useEffect(()=>{
    getStore()
+
+
+   let counter = 0;
+const intervalId = setInterval(() => {
+  getStore()
+  console.log("Iteration:", counter);
+  counter++;
+
+  if (counter === 1) {
+    clearInterval(intervalId);
+  }
+}, 6000);
+ 
   },[])
 
 
@@ -73,7 +91,24 @@ const updateStoreCates = async (newCates) => {
 
  // cates && console.log(cates)
 
+ const handleUndoData = () => {
+  
+   const tempData = localStorage.getItem('temp-data');
+   
+   console.log('from home');
+   setData(JSON.parse(tempData));
+   updateStoreData(JSON.parse(tempData) , true);
+ }
+
+
+
  const handleDelete =(indexs) =>{
+
+  //creating temp for undo
+
+  localStorage.setItem('temp-data' , JSON.stringify(data));
+
+
   let id = indexs.indexs
   
   console.log(id);
@@ -90,6 +125,9 @@ console.log(newData);
 setData(newData);
 // localStorage.setItem("data" , JSON.stringify(newData))
 updateStoreData(newData);
+
+
+
      
 
    }
@@ -258,7 +296,7 @@ const handleSortName = (e) => {
     return (
         <div>
             <div className="main max-w-6xl  mx-auto mt-10 ">
-            <ToastContainer />
+            <ToastContainer autoClose={3000}/>
               {/* <button className="btn btn-success " onClick={searchfix}>Category fix</button> */}
         <div className="options flex items-center flex-wrap">
 

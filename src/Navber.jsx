@@ -55,7 +55,7 @@ const Navber = () => {
             <div className="navbar-end">
 
 
-   <label className=" cursor-pointer gap-2 hidden md:flex">
+   {/* <label className=" cursor-pointer gap-2 hidden md:flex">
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="20"
@@ -70,7 +70,8 @@ const Navber = () => {
     <path
       d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
   </svg>
-   <input type="checkbox" value="dracula" defaultChecked className="toggle theme md:theme-controller" /> 
+   <input type="checkbox" value="dracula" defaultChecked className="toggle md:theme-controller" 
+     /> 
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="20"
@@ -83,12 +84,12 @@ const Navber = () => {
     strokeLinejoin="round">
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
   </svg>
-</label> 
+</label>  */}
 
 
-<label className="swap swap-rotate inline-grid md:hidden scale-75">
+<label className="swap swap-rotate  scale-75">
    
-  <input type="checkbox" className=" theme-controller"   value="dracula" defaultChecked  />
+  <input type="checkbox"  className=" theme-controller"   value="dracula" defaultChecked  />
 
 
   <svg

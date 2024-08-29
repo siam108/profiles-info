@@ -40,7 +40,7 @@ const updateStoreData = async (newData) => {
   try{
       await updateDoc(dataDoc, {data : JSON.stringify(newData)});
       getStore()
-      toast('updated successfull')
+      toast('updated successfullssss <button class="btn btn-info"> Undo</button>')
   } catch (err) {
      toast(err);
   }
@@ -51,7 +51,7 @@ const updateStoreCates = async (newCates) => {
   try{
       await updateDoc(dataDoc, { cates: newCates});
       getStore()
-      toast('updated successfull')
+      toast('updated successfullssss <button class="btn btn-info"> Undo</button>')
   } catch (err) {
      toast(err);
   }
@@ -70,7 +70,7 @@ const updateStoreCates = async (newCates) => {
 
   return (
     <div>
-      <ToastContainer />
+      <ToastContainer autoClose={3000}/>
       <div className="main max-w-6xl  mx-auto mt-10 ">
         <Link to="/categories" className="btn btn-info mt-10 btn-sm  ">
           <svg
